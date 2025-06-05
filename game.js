@@ -37,13 +37,8 @@ class ScreamyBird {
         this.pipeFrequency = 150;
         this.frameCount = 0;
         
-        // Frame rate limiting
+        // Simplified frame timing
         this.lastTime = 0;
-        this.targetFPS = 60;
-        this.frameInterval = 1000 / this.targetFPS;
-        this.deltaTime = 0;
-        this.timeSinceLastPipe = 0;
-        this.pipeSpawnInterval = 2500; // milliseconds between pipes
         
         this.init();
     }
@@ -99,7 +94,7 @@ class ScreamyBird {
         this.bird.velocity = 0;
         this.pipes = [];
         this.frameCount = 0;
-        this.timeSinceLastPipe = 0;
+        this.lastTime = 0;
         
         this.startBtn.style.display = 'none';
         this.gameOverElement.classList.add('hidden');
@@ -121,19 +116,18 @@ class ScreamyBird {
             this.bird.velocity = this.bird.lift * (this.volume / 100);
         }
         
-        // Use delta time for physics
-        this.bird.velocity += this.bird.gravity * (this.deltaTime / 16.67); // 16.67ms = 60fps
-        this.bird.y += this.bird.velocity * (this.deltaTime / 16.67);
+        // Simple fixed physics
+        this.bird.velocity += this.bird.gravity;
+        this.bird.y += this.bird.velocity;
         
-        // Time-based pipe spawning
-        this.timeSinceLastPipe += this.deltaTime;
-        if (this.timeSinceLastPipe >= this.pipeSpawnInterval) {
+        // Frame-based pipe spawning
+        this.frameCount++;
+        if (this.frameCount % this.pipeFrequency === 0) {
             this.createPipe();
-            this.timeSinceLastPipe = 0;
         }
         
         this.pipes.forEach(pipe => {
-            pipe.x -= this.gameSpeed * (this.deltaTime / 16.67);
+            pipe.x -= this.gameSpeed;
             
             if (!pipe.passed && pipe.x + pipe.width < this.bird.x) {
                 pipe.passed = true;
@@ -241,13 +235,18 @@ class ScreamyBird {
     }
     
     gameLoop(currentTime = 0) {
-        this.deltaTime = currentTime - this.lastTime;
-        
-        if (this.deltaTime >= this.frameInterval) {
-            this.update();
-            this.render();
-            this.lastTime = currentTime;
+        // Simple timing to prevent excessive speed on high refresh rates
+        const now = performance.now();
+        if (now - this.lastTime < 16) { // Cap at ~60fps
+            if (this.gameRunning) {
+                requestAnimationFrame((time) => this.gameLoop(time));
+            }
+            return;
         }
+        this.lastTime = now;
+        
+        this.update();
+        this.render();
         
         if (this.gameRunning) {
             requestAnimationFrame((time) => this.gameLoop(time));
