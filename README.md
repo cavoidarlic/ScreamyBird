@@ -1,2 +1,8 @@
 # ScreamyBird
-Scream = bird fly. No scream = bird fall down
+1. Open the thing
+2. Click start
+3. SCREAM LOUDLY
+4. Bird goes up
+5. Stop screaming
+6. Bird falls down
+7. Repeat until you die
