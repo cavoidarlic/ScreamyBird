@@ -1,4 +1,5 @@
 # ScreamyBird
+## Try it out here: https://cavoidarlic.github.io/ScreamyBird/
 1. Open the thing
 2. Click start
 3. SCREAM LOUDLY
