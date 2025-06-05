@@ -37,6 +37,11 @@ class ScreamyBird {
         this.pipeFrequency = 150;
         this.frameCount = 0;
         
+        // Frame rate limiting
+        this.lastTime = 0;
+        this.targetFPS = 60;
+        this.frameInterval = 1000 / this.targetFPS;
+        
         this.init();
     }
     
@@ -228,12 +233,17 @@ class ScreamyBird {
         this.gameOverElement.classList.remove('hidden');
     }
     
-    gameLoop() {
-        this.update();
-        this.render();
+    gameLoop(currentTime = 0) {
+        const deltaTime = currentTime - this.lastTime;
+        
+        if (deltaTime >= this.frameInterval) {
+            this.update();
+            this.render();
+            this.lastTime = currentTime - (deltaTime % this.frameInterval);
+        }
         
         if (this.gameRunning) {
-            requestAnimationFrame(() => this.gameLoop());
+            requestAnimationFrame((time) => this.gameLoop(time));
         }
     }
 }
